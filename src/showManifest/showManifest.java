@@ -313,32 +313,37 @@ class SingleThreadEx2 implements Runnable {
 			}
 			
 			String xml = urlLoader.getPage(url);
-			System.out.println(xml);
-			
-			Element root = xmlParser.getRootNode(xml);
-			manifestParser.parsing(root);
-			manifestParser.setChunkTime();
-			//manifestParser.showStreams();
-			
-			ArrayList<String> s = new ArrayList<String>();
-			ArrayList<streamInfo> si = new ArrayList<streamInfo>();
-			int n = manifestParser.getNumStreams();
-			for(int i=0; i<n; i++) {
-				streamInfo sinfo = new streamInfo(); 
-				sinfo.type = manifestParser.getStreamType(i);
-				sinfo.name = manifestParser.getStreamName(i);
-				sinfo.time = manifestParser.getCTimeStringInStream(i);
-				String _s = manifestParser.getCTimeStringInStream(i);
-				if(_s.length() > 0) {
-					s.add(_s);
-					si.add(sinfo);
-				}
-				//s.add(manifestParser.getCTimeStringInStream(i));
+			if(xml.length() == 0) {
+				pGui.showMessage("error in URL");
 			}
-			//String ctimes = manifestParser.getCTimeStringInStream(0);
-			//System.out.println(ctimes);
-			//pGui.showCTimes(s);
-			pGui.showCTimes2(si);
+			else {
+				//System.out.println(xml);
+
+				Element root = xmlParser.getRootNode(xml);
+				manifestParser.parsing(root);
+				manifestParser.setChunkTime();
+				//manifestParser.showStreams();
+
+				ArrayList<String> s = new ArrayList<String>();
+				ArrayList<streamInfo> si = new ArrayList<streamInfo>();
+				int n = manifestParser.getNumStreams();
+				for (int i = 0; i < n; i++) {
+					streamInfo sinfo = new streamInfo();
+					sinfo.type = manifestParser.getStreamType(i);
+					sinfo.name = manifestParser.getStreamName(i);
+					sinfo.time = manifestParser.getCTimeStringInStream(i);
+					String _s = manifestParser.getCTimeStringInStream(i);
+					if (_s.length() > 0) {
+						s.add(_s);
+						si.add(sinfo);
+					}
+					//s.add(manifestParser.getCTimeStringInStream(i));
+				}
+				//String ctimes = manifestParser.getCTimeStringInStream(0);
+				//System.out.println(ctimes);
+				//pGui.showCTimes(s);
+				pGui.showCTimes2(si);
+			}
 		}
 	}
 
@@ -444,7 +449,17 @@ class cTimeGUI extends JFrame implements ActionListener {
 		}
 		setVisible(true);
 	}
-	
+
+	public void showMessage(String msg) {
+		if(needAdditionalTextField == true) {
+			addTextField(1);
+		}
+		needAdditionalTextField = false;
+		qArea.get(0).setText(msg);
+		qArea.get(0).append(System.lineSeparator());
+		setVisible(true);
+	}
+
 	public void actionPerformed(ActionEvent e) {
         Object obj = e.getSource();
         if((JButton)obj == btStart) {
@@ -467,8 +482,12 @@ public class showManifest {
 
 	public static void main(String[] args) {
 		try {
-			String url = args[0];
-			
+			String url;
+			if(args.length == 0)
+				url = "http://localhost/manifest";
+			else
+				url = args[0];
+
 			cTimeGUI cTimeGui = new cTimeGUI(url);
 	    	cTimeGui.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 			
